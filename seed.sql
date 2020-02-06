@@ -6,7 +6,3 @@ VALUES ("Sales Manager", 82000, 1), ("Junior Salesperson", 4000, 1), ("Account D
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Alexander", "Hogle", 2, 2), ("Ronald", "Pfiester", 1, NULL), ("Cameron", "Gideon", 2, 2), ("Cameron", "Johnston", 3, NULL), ("Timothy", "Greenlee", 4, 4), ("Jake", "Smith", 5, NULL), ("Julia", "Robinson", 6, NULL), ("Hillary", "Jefferson", 7, NULL), ("Ashley", "Washington", 8, 8);
-
-SELECT * FROM department;
-SELECT * FROM role;
-SELECT * FROM employee;
