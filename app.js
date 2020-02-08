@@ -63,11 +63,11 @@ async function addDepartment() {
         }
     ]).then(answer => {
         db.query("INSERT INTO department (name) VALUES (?)", [answer.deptName]);
-        console.log("\x1b[32m", `${answer.deptName} was added to departments.`);
+        console.log(`${answer.deptName} was added to departments.`);
     })
 };
 
-//add roles
+//add role
 async function addRole() {
     let dept = await db.query('SELECT id, name FROM department');
 
@@ -103,11 +103,61 @@ async function addRole() {
     ]).then(answer => {
         let deptID = dept.find(obj => obj.name === answer.roleDept).id
         db.query("INSERT INTO role (title, salary, department_id) VALUES (?)", [[answer.rName, answer.salNum, deptID]]);
-        console.log("\x1b[32m", `${answer.rName} was added to the ${answer.roleDept} department.`);
+        console.log(`${answer.rName} was added to the ${answer.roleDept} department.`);
     })
 }
 
-//Update employee roles
+//Add employee
+async function addEmployee() {
+    let roles = await db.query('SELECT id, title FROM role');
+    let managers = await db.query('SELECT id, CONCAT(first_name, " ", last_name) AS Manager FROM employee');
+    managers.unshift({ id: null, Manager: "None" });
+
+    inquirer.prompt([
+        {
+            name: "firstName",
+            type: "input",
+            message: "Enter employee's first name:",
+            validate: async function confirmStringInput(input) {
+                if ((input.trim() != "") && (input.trim().length <= 30)) {
+                    return true;
+                }
+                return "Invalid input. Please limit your input to 30 characters or less."
+            }
+        },
+        {
+            name: "lastName",
+            type: "input",
+            message: "Enter employee's last name:",
+            validate: async function confirmStringInput(input) {
+                if ((input.trim() != "") && (input.trim().length <= 30)) {
+                    return true;
+                }
+                return "Invalid input. Please limit your input to 30 characters or less."
+            }
+        },
+        {
+            name: "role",
+            type: "list",
+            message: "Choose employee role:",
+            choices: roles.map(obj => obj.title)
+        },
+        {
+            name: "manager",
+            type: "list",
+            message: "Choose employee's manager:",
+            choices: managers.map(obj => obj.Manager)
+        }
+    ]).then(answer => {
+        let rolesDetails = roles.find(obj => obj.title === answer.role);
+        let manager = managers.find(obj => obj.Manager === answer.manager);
+        db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answer.firstName.trim(), answer.lastName.trim(), rolesDetails.id, manager.id]]);
+        console.log(`${answer.firstName} was added to the employee database!`);
+    
+    });
+};
+
+//Update employees and roles
 
 //BONUS
 //Update employee managers
@@ -118,8 +168,8 @@ async function addRole() {
 function init() {
     // viewDepartments();
     // viewRoles();
-    // viewEmployees();
-    addRole();
+    addEmployee();
+    viewEmployees();
 }
 
 
