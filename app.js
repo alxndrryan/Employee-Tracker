@@ -148,7 +148,45 @@ async function addEmployee() {
     });
 };
 
-//Update employees and roles
+//Update employees roles
+
+async function updateEmployeeRole() {
+    let employees = await db.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
+    employees.push({ id: null, name: "Cancel" });
+    let roles = await db.query('SELECT id, title FROM role');
+    let managers = await db.query('SELECT id, CONCAT(first_name, " ", last_name) AS Manager FROM employee WHERE manager_id IS Null');
+    managers.unshift({ id: null, Manager: "None" });
+
+    inquirer.prompt([
+        {
+            name: "empName",
+            type: "list",
+            message: "Change role for which employee?",
+            choices: employees.map(obj => obj.name)
+        },
+        {
+            name: "newRole",
+            type: "list",
+            message: "Change their role to:",
+            choices: roles.map(obj => obj.title)
+        },
+        {
+            name: "manager",
+            type: "list",
+            message: "Choose the employee's manager:",
+            choices: managers.map(obj => obj.Manager)
+        }
+    ]).then(answers => {
+        if (answers.empName != "Cancel") {
+            let empID = employees.find(obj => obj.name === answers.empName).id
+            let roleID = roles.find(obj => obj.title === answers.newRole).id
+            let manager = managers.find(obj => obj.Manager === answers.manager);
+            db.query("UPDATE employee SET role_id=?, manager_id=? WHERE id=?", [roleID, manager.id, empID]);
+            
+            console.log(`${answers.empName} new role is ${answers.newRole}`);
+        }
+    })
+};
 
 //BONUS
 //Update employee managers
@@ -158,6 +196,8 @@ async function addEmployee() {
 
 function init() {
     viewEmployees();
+    // updateEmployeeRole();
+
 }
 
 
