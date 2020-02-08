@@ -108,52 +108,43 @@ async function addRole() {
 }
 
 //Add employee
+
 async function addEmployee() {
-    let roles = await db.query('SELECT id, title FROM role');
-    let managers = await db.query('SELECT id, CONCAT(first_name, " ", last_name) AS Manager FROM employee');
+    let positions = await db.query('SELECT id, title FROM role');
+    let managers = await db.query('SELECT id, CONCAT(first_name, " ", last_name) AS Manager FROM employee WHERE manager_id IS Null');
     managers.unshift({ id: null, Manager: "None" });
 
     inquirer.prompt([
         {
             name: "firstName",
             type: "input",
-            message: "Enter employee's first name:",
-            validate: async function confirmStringInput(input) {
-                if ((input.trim() != "") && (input.trim().length <= 30)) {
-                    return true;
-                }
-                return "Invalid input. Please limit your input to 30 characters or less."
-            }
+            message: "Enter employee's first name:"
+            // validate: confirmStringInput
         },
         {
             name: "lastName",
             type: "input",
-            message: "Enter employee's last name:",
-            validate: async function confirmStringInput(input) {
-                if ((input.trim() != "") && (input.trim().length <= 30)) {
-                    return true;
-                }
-                return "Invalid input. Please limit your input to 30 characters or less."
-            }
+            message: "Enter employee's last name:"
+            // validate: confirmStringInput
         },
         {
             name: "role",
             type: "list",
             message: "Choose employee role:",
-            choices: roles.map(obj => obj.title)
+            choices: positions.map(obj => obj.title)
         },
         {
             name: "manager",
             type: "list",
-            message: "Choose employee's manager:",
+            message: "Choose the employee's manager:",
             choices: managers.map(obj => obj.Manager)
         }
-    ]).then(answer => {
-        let rolesDetails = roles.find(obj => obj.title === answer.role);
-        let manager = managers.find(obj => obj.Manager === answer.manager);
-        db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answer.firstName.trim(), answer.lastName.trim(), rolesDetails.id, manager.id]]);
-        console.log(`${answer.firstName} was added to the employee database!`);
-    
+    ]).then(answers => {
+        let roleDetails = positions.find(obj => obj.title === answers.role);
+        let manager = managers.find(obj => obj.Manager === answers.manager);
+        db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answers.firstName.trim(), answers.lastName.trim(), roleDetails.id, manager.id]]);
+        console.log(`${answers.firstName} ${answers.lastName} was added to the employee database.`);
+        
     });
 };
 
@@ -166,9 +157,6 @@ async function addEmployee() {
 //View total utilized budget of a department --ie the combined salaries of all employees in that department
 
 function init() {
-    // viewDepartments();
-    // viewRoles();
-    addEmployee();
     viewEmployees();
 }
 
