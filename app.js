@@ -21,7 +21,7 @@ async function viewDepartments() {
         if (err) throw err;
         console.log(' ');
         console.table(res);
-        
+        init();
     })
 };
 
@@ -31,7 +31,7 @@ async function viewRoles() {
     await db.query('SELECT r.id, title, salary, name AS department FROM role r LEFT JOIN department d ON department_id = d.id', (err, res) => {
         if (err) throw err;
         console.table(res);
-        
+        init();
     })
 };
 
@@ -41,7 +41,7 @@ async function viewEmployees() {
     await db.query('SELECT e.id, e.first_name AS First_Name, e.last_name AS Last_Name, title AS Title, salary AS Salary, name AS Department, CONCAT(m.first_name, " ", m.last_name) AS Manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role r ON e.role_id = r.id INNER JOIN department d ON r.department_id = d.id', (err, res) => {
         if (err) throw err;
         console.table(res);
-
+        init();
     });
 };
 
@@ -64,6 +64,7 @@ async function addDepartment() {
     ]).then(answer => {
         db.query("INSERT INTO department (name) VALUES (?)", [answer.deptName]);
         console.log(`${answer.deptName} was added to departments.`);
+        init();
     })
 };
 
@@ -104,6 +105,7 @@ async function addRole() {
         let deptID = dept.find(obj => obj.name === answer.roleDept).id
         db.query("INSERT INTO role (title, salary, department_id) VALUES (?)", [[answer.rName, answer.salNum, deptID]]);
         console.log(`${answer.rName} was added to the ${answer.roleDept} department.`);
+        init();
     })
 }
 
@@ -144,7 +146,7 @@ async function addEmployee() {
         let manager = managers.find(obj => obj.Manager === answers.manager);
         db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)", [[answers.firstName.trim(), answers.lastName.trim(), roleDetails.id, manager.id]]);
         console.log(`${answers.firstName} ${answers.lastName} was added to the employee database.`);
-        
+        init();
     });
 };
 
@@ -182,9 +184,9 @@ async function updateEmployeeRole() {
             let roleID = roles.find(obj => obj.title === answers.newRole).id
             let manager = managers.find(obj => obj.Manager === answers.manager);
             db.query("UPDATE employee SET role_id=?, manager_id=? WHERE id=?", [roleID, manager.id, empID]);
-            
             console.log(`${answers.empName} new role is ${answers.newRole}`);
         }
+        init();
     })
 };
 
@@ -199,13 +201,25 @@ async function updateEmployeeRole() {
 function employeeMenu() {
     inquirer.prompt({
         name: "empmenu",
-        type: "lsit",
+        type: "list",
         message: "Choose an option:",
         choices: [
             "Add New Employee",
             "Edit Employee Role",
             "Return To Main Menu"
         ]
+    }).then(res => {
+        switch (res.empmenu) {
+            case "Add New Employee":
+                addEmployee();
+                break;
+            case "Edit Employee Role":
+                updateEmployeeRole();
+                break;
+            case "Return To Main Menu":
+                init();
+                break;
+        }
     })
 }
 
@@ -215,7 +229,7 @@ function init() {
     inquirer.prompt({
         name: "mainmenu",
         type: "list",
-        message: "Choose an option:",
+        message: "Choose an option. Press 'control + c' at anytime to quit.",
         choices: [
             "View Employees",
             "Edit Employee Info",
