@@ -148,7 +148,7 @@ async function addEmployee() {
     });
 };
 
-//Update employees roles
+//Update employees roles and employee manager
 
 async function updateEmployeeRole() {
     let employees = await db.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee');
@@ -189,15 +189,63 @@ async function updateEmployeeRole() {
 };
 
 //BONUS
-//Update employee managers
+//Update employee managers (executed in updateEmployeeRole function)
 //View employees by managers
 //Delete departments, roles, and employees
 //View total utilized budget of a department --ie the combined salaries of all employees in that department
 
-function init() {
-    viewEmployees();
-    // updateEmployeeRole();
+//Menu to add employee and update employee's role
 
+function employeeMenu() {
+    inquirer.prompt({
+        name: "empmenu",
+        type: "lsit",
+        message: "Choose an option:",
+        choices: [
+            "Add New Employee",
+            "Edit Employee Role",
+            "Return To Main Menu"
+        ]
+    })
+}
+
+//Runs application
+
+function init() {
+    inquirer.prompt({
+        name: "mainmenu",
+        type: "list",
+        message: "Choose an option:",
+        choices: [
+            "View Employees",
+            "Edit Employee Info",
+            "View Roles",
+            "Add Roles",
+            "View Departments",
+            "Add Departments"
+        ]
+    }).then(res => {
+        switch (res.mainmenu) {
+            case "View Employees":
+                viewEmployees();
+                break;
+            case "Edit Employee Info":
+                employeeMenu();
+                break;
+            case "View Roles":
+                viewRoles();
+                break;
+            case "Add Roles":
+                addRole();
+                break;
+            case "View Departments":
+                viewDepartments();
+                break;
+            case "Add Departments":
+                addDepartment();
+                break;
+        }
+    })
 }
 
 
