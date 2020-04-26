@@ -4,11 +4,18 @@ Employee Tracker is an employee management application built with Node.js. Compa
 
 ## Sample Usage
 
+
+
+## Prerequisites
+
+1. MySQL
+2. Node.js
+
 ## Installing
 
 1. Clone repository
 2. npm install dependencies
-3. Run app.js
+3. Run app.js to start application
 
 ## Built With
 
