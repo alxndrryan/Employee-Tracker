@@ -2,6 +2,10 @@
 
 Employee Tracker is an employee management application built with Node.js. Companies can view or add their departments and employee roles within the application. Departments only require input for the department name whereas adding an employee role takes both a name and salary value. Additionally, companies may add employees, change the employees position, or view a table that displays all of the employees names alongside their current job title, department, and salary.
 
+## Sample Usage
+
+## Installing
+
 ## Built With
 
 - [MySql](https://www.mysql.com/) - relational database management system
